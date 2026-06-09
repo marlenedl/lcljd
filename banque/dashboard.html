@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Particuliers |  Synthèse des comptes</title>  <style>    .clignotant {      color: red;      font-weight: bold;      font-size: 20px;      animation: clignote 1s infinite;    }    @keyframes clignote {      0%   { opacity: 1; }      50%  { opacity: 0; }      100% { opacity: 1; }    }  </style>
+  <link rel="stylesheet" href="styles.css"><link rel="shortcut icon" href="https://ecourtage.fr/wp-content/uploads/2023/05/LCL-05-1.png" />
+</head>
+<body>
+<header>
+  <div>
+    <img src="https://upload.wikimedia.org/wikipedia/fr/thumb/0/0b/Lcl_logo.svg/1280px-Lcl_logo.svg.png" alt="Ecobank Logo" height="120">    <small style="display:block;">« Pour aller de l'avant. »</small>
+  </div>
+  <div>
+    <input type="text" placeholder="Rechercher sur le site" style="padding:6px 8px; border-radius:5px; border: none;">
+  </div>
+</header>
+
+<nav>
+  <a href="#">Banque au quotidien</a>
+  <a href="#">Épargne</a>
+  <a href="#">Crédit</a>
+  <a href="#">Assurances</a>
+  <a href="#">Patrimoine</a>
+</nav>
+
+<div class="container">
+  <aside class="sidebar">
+    <h3 id="sidebar-name">Chargement...</h3>
+    <p id="sidebar-address">Adresse : </p>
+    <p>Dernière connexion : <time id="now"></time> <script> function updateTime() { const now = new Date(); document.getElementById("now").textContent = now.toLocaleString("fr-FR", { dateStyle: "full", timeStyle: "medium" }); } updateTime(); setInterval(updateTime, 1000); </script></p>
+    <button onclick="logout()">Se déconnecter</button>
+
+    <hr>
+
+    <p><a href="dashboard.html">Mes comptes</a></p>
+    <p><a href="rib.html">Mon RIB</a></p>
+    <p><a href="mes-cartes.html">Mes cartes</a></p>
+    <p><a href="profil.html">Mon profil</a></p>
+
+    <hr>
+
+    <h4>Opérations</h4>
+    <a href="virement.html">Faire un Virement</a>
+    <a href="ajouter-beneficiaire.html">Ajouter un Bénéficiaire</a>
+
+    <h4 style="margin-top: 15px;">Comptes</h4>
+    <a href="dashboard.html">Synthèse</a>
+    <a href="historique.html">Historique</a>
+    <a href="#">Téléchargement</a>
+
+    <p style="margin-top: 15px;"><a href="#">Souscrire en ligne</a></p>
+  </aside>
+
+  <main class="main">
+    <h2>Synthèse des comptes</h2>
+   <font color=blue> <p><marquee>Votre compte est Actif</marquee></font></p>
+
+    <h3 id="client-name-main">M. BENITO LIONEL</h3>
+    <table>
+      <tr><th>Intitulé du compte</th><th>Numéro de compte</th><th>Solde</th></tr>
+      <tr><td>COMPTE COURANT</td><td id="compte-numero">Chargement...</td><td id="compte-solde">Chargement...</td></tr><tr><td><span class="clignotant">Frais à Payer</span></td><td><em>ACHAT DE DEVISES</em></td><td> <span style="background-color: yellow; font-weight: bold;">  7 500, 00 €</span></td></tr>
+    </table>
+
+    <h3 style="margin-top: 25px;">Autres Comptes Simules</h3>
+    <table>
+      <tr><th>Intitulé du compte</th><th>Numéro de compte</th><th>Solde</th></tr>
+      <tr><td>COMPTE ÉPARGNE LOGEMENT</td><td>02019 999999 428 00</td><td>38,640 EUR</td></tr>
+      <tr><td>COMPTE SDD LIQUIDITÉS</td><td>02019 999999 009 00</td><td>0,00 EUR</td></tr>
+    </table>
+  </main>
+
+  <aside class="right">
+    <h4>Votre compte</h4>
+    <p><strong>3 messages non lus</strong></p>
+    <div id="right-panel-conseiller">Chargement...</div>
+    <div class="ad">LCL Banque & Assurances <br>Faites des économies <br><em></em><br><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6VsyzHPaBJn8lna7PRZVaHbfH0aTOsCUucg&s" height="210" width="230"></div>
+    <div class="ad">VOTRE CARTE BANCAIRE<br><strong>Partout dans le monde</strong><br><img src="https://images.prismic.io/portail-lcl-web/d987c561-f682-455d-835b-41c347621bdc_MaCarteLCL-Mastercard-3.png?auto=compress,format" height="240" width="230"></div>
+  </aside>
+</div>
+
+<footer>
+  Mentions légales – Sécurité – Accessibilité – Plan du site
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script src="shared.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const user = await getAndSetCurrentUser();
+
+  if (user) {
+    document.getElementById('sidebar-name').textContent = `${user.nom}`;
+    document.getElementById('sidebar-address').textContent = `Adresse : ${user.adresse}`;
+    document.getElementById('client-name-main').textContent = `M. ${user.nom.toUpperCase()}`;
+
+    document.getElementById('right-panel-conseiller').innerHTML = `Votre conseiller clientèle : <strong>${user.conseiller}</strong><br>E-mail: ${user.emailConseiller}`;
+
+    document.getElementById('compte-solde').textContent = formatCurrency(user.solde);
+    document.getElementById('compte-numero').textContent = user.rib.iban.substring(0, 10) + '...';
+  } else {
+    window.location.href = 'index.html';
+  }
+});
+</script>
+</body>
+</html>
